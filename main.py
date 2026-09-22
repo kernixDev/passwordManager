@@ -7,12 +7,10 @@ red = '\033[0;31m'
 reset = '\033[0;0m'
 print('\033[?25l')
 
-with open('items.json', 'w', encoding='utf-16') as f:
-    try:
-        data = json.load(f)
-    except:
+if not os.path.exists('items.json'):
+    with open('items.json', 'w', encoding='utf-8') as f:
         f.write('[]')
-        
+
 def help():
     banner('help')
     print(f"""{35 * ' '} Need help? Contact me at
@@ -22,7 +20,7 @@ def help():
 
 def encrypt(password):
     scrambled = []
-    alphabet = list("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789!/;.:?,*$^)([]#~")
+    alphabet = list("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789!/;.:?,*$^)@([]#~")
     random.shuffle(alphabet)
     shuffled = "".join(alphabet)
 
@@ -71,7 +69,7 @@ def addEntry():
         username = input('                                        Username: ').lower()
         password = input('                                        Password: ')
         website = input('                                        Website: ').lower()
-        if not website.startswith('http://') or not website.startswith('https://'):
+        if not website.startswith('http://') and not website.startswith('https://'):
             website = f'https://{website}'
 
         if name and username and password and website:
@@ -97,42 +95,47 @@ def addEntry():
         json.dump(data, f, indent=4)
 
 def getEntry():
-    found = False
-    banner('Get an entry')
-    name = input('                                        Item Name or ID: ').lower()
-    with open('items.json', 'r', errors='ignore', encoding='utf-8') as f:
-        data = json.load(f)
+    try:
+        found = False
+        banner('Get an entry')
+        name = input('                                        Item Name or ID: ').lower()
+        with open('items.json', 'r', errors='ignore', encoding='utf-8') as f:
+            data = json.load(f)
 
-    isInteger = True
-    for chars in name:
-        if not chars in "0123456789":
-            isInteger = False
+        isInteger = True
+        for chars in name:
+            if not chars in "0123456789":
+                isInteger = False
 
-    if not isInteger:
-        for dicts in data:
-            if str(name).lower() == str(dicts.get('name')).lower().replace('\n', ''):
+        if not isInteger:
+            for dicts in data:
+                if str(name).lower() == str(dicts.get('name')).lower().replace('\n', ''):
+                    found = True
+                    banner('Here is your entry')
+                    for entry in dicts:
+                        print(True if entry=="password" else False)
+                        if entry == "password":
+                            print(f"""{spacesItem}{entry}: {decrypt(dicts[entry])}""")
+                        else:
+                            print(f"""{spacesItem}{entry}: {dicts[entry]}""")
+                if found:
+                    break
+
+        else:
+            banner('Here is your entry')
+            for u in data[int(name) - 1]:
+                if u == "password":
+                    print(f'{spacesItem}{u}: {decrypt(data[int(name) - 1][u])}')
+                else:
+                    print(f'{spacesItem}{u}: {data[int(name) - 1][u]}')
                 found = True
-                banner('Here is your entry')
-                for entry in dicts:
-                    print(True if entry=="password" else False)
-                    if entry == "password":
-                        print(f"""{spacesItem}{entry}: {decrypt(dicts[entry])}""")
-                    else:
-                        print(f"""{spacesItem}{entry}: {dicts[entry]}""")
-            if found:
-                break
 
-    else:
-        banner('Here is your entry')
-        for u in data[int(name) - 1]:
-            if u == "password":
-                print(f'{spacesItem}{u}: {decrypt(data[int(name) - 1][u])}')
-            else:
-                print(f'{spacesItem}{u}: {data[int(name) - 1][u]}')
-            found = True
+        if not found:
+            banner('Your entry was not found')
 
-    if not found:
-        banner('Your entry was not found')
+    except:
+        banner(f"""Your entry is invalid""")
+        print(f"{spacesItem}You only have {len(data)} entries\n")
 
     input(f'{red}{spacesItem}Press enter to go back...{reset}')
 
@@ -149,17 +152,8 @@ def viewEntries():
 
 def home():
     os.system('cls' if os.name=='nt' else 'clear')
-    print(f"""{red}
-                        ______ _    _______  ___  ___                                  
-                        | ___ \ |  | |  _  \ |  \/  |                                  
-                        | |_/ / |  | | | | | | .  . | __ _ _ __   __ _  __ _  ___ _ __ 
-                        |  __/| |/\| | | | | | |\/| |/ _` | '_ \ / _` |/ _` |/ _ \ '__|
-                        | |   \  /\  / |/ /  | |  | | (_| | | | | (_| | (_| |  __/ |   
-                        \_|    \/  \/|___/   \_|  |_/\__,_|_| |_|\__,_|\__, |\___|_|   
-                                                                        __/ |          
-                                            {reset}by {red}kernix                  |___/  {reset}   
-
-                                        [1] Add an entry
+    banner("by kernix")
+    print(f"""                                        [1] Add an entry
                                         [2] Get an entry
                                         [3] View entries
                                         [?] Help
