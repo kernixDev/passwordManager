@@ -1,0 +1,5 @@
+items.json
+*.env
+doc/
+encrypt.py/
+~.
