@@ -1,6 +1,5 @@
 import os, json
 import random
-#Finir decrypt()
 
 spacesItem = 40 * " "
 spacesInput = '\n' + 20 * " "
@@ -8,11 +7,17 @@ red = '\033[0;31m'
 reset = '\033[0;0m'
 print('\033[?25l')
 
+with open('items.json', 'w', encoding='utf-16') as f:
+    try:
+        data = json.load(f)
+    except:
+        f.write('[]')
+        
 def help():
     banner('help')
     print(f"""{35 * ' '} Need help? Contact me at
 {30 * " "}GitHub: https://github.com/kernixDev/
-{30 * " "}Email: kernix@totallynotadummyemail.com""")
+{30 * " "}Email: kernix@proton.me""")
     input(f"{spacesInput}{red}Press enter to go back...{reset}")
 
 def encrypt(password):
@@ -35,6 +40,7 @@ def encrypt(password):
 def decrypt(password):
     password, alphabet, shift = password.split('|')
     decryptedPw = []
+    shift = int(shift)
 
     for char in password:
         index = alphabet.index(char)
@@ -119,7 +125,10 @@ def getEntry():
     else:
         banner('Here is your entry')
         for u in data[int(name) - 1]:
-            print(f'{spacesItem}{u}: {data[int(name) - 1][u]}')
+            if u == "password":
+                print(f'{spacesItem}{u}: {decrypt(data[int(name) - 1][u])}')
+            else:
+                print(f'{spacesItem}{u}: {data[int(name) - 1][u]}')
             found = True
 
     if not found:
