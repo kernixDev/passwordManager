@@ -1,5 +1,5 @@
 items.json
 *.env
 doc/
-encrypt.py/
+encrypt.py
 ~.
