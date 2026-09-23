@@ -113,7 +113,6 @@ def getEntry():
                     found = True
                     banner('Here is your entry')
                     for entry in dicts:
-                        print(True if entry=="password" else False)
                         if entry == "password":
                             print(f"""{spacesItem}{entry}: {decrypt(dicts[entry])}""")
                         else:
